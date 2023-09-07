@@ -1,6 +1,7 @@
 from typing import Callable
 import numpy as np
 import torch
+import torchvision
 from PIL import Image
 
 from T2IBenchmark.feature_extractors.base_feature_extractor import BaseFeatureExtractor
@@ -20,16 +21,20 @@ class InceptionV3FE(BaseFeatureExtractor):
 
         self.resizer = build_resizer("clean")
 
-    def get_preprocess_fn(self) -> Callable[[Image.Image], np.ndarray]:
+    def get_preprocess_fn(self) -> Callable[[Image.Image], torch.Tensor]:
         resizer = self.resizer
+        transforms = torchvision.transforms.ToTensor()
 
         def preprocess(image: Image.Image) -> np.ndarray:
+            image = image.convert('RGB')
             image_resized = resizer(np.array(image))
-            return image_resized
+            x = transforms(image_resized)
+            return 2 * x - 1
 
         return preprocess
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         with torch.no_grad():
-            feat = self.inception(x.to(self.device))
+            x = x.to(self.device)
+            feat = self.inception(x)[0].squeeze(-1).squeeze(-1)
         return feat.detach().cpu()

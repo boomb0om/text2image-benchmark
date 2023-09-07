@@ -35,7 +35,6 @@ class InceptionV3(nn.Module):
     def __init__(
         self,
         output_blocks=(DEFAULT_BLOCK_INDEX,),
-        normalize_input=True,
         requires_grad=False,
         use_fid_inception=True
     ):
@@ -48,9 +47,6 @@ class InceptionV3(nn.Module):
                 - 1: corresponds to output of second max pooling
                 - 2: corresponds to output which is fed to aux classifier
                 - 3: corresponds to output of final average pooling
-        normalize_input : bool
-            If true, scales the input from range (0, 1) to the range the
-            pretrained Inception network expects, namely (-1, 1)
         requires_grad : bool
             If true, parameters of the model require gradients. Possibly useful
             for finetuning the network
@@ -65,7 +61,6 @@ class InceptionV3(nn.Module):
         """
         super(InceptionV3, self).__init__()
 
-        self.normalize_input = normalize_input
         self.output_blocks = sorted(output_blocks)
         self.last_needed_block = max(output_blocks)
 
@@ -139,9 +134,6 @@ class InceptionV3(nn.Module):
         output = []
         x = inp
 
-        if self.normalize_input:
-            x = 2 * x - 1  # Scale from range (0, 1) to range (-1, 1)
-
         for idx, block in enumerate(self.blocks):
             x = block(x)
             if idx in self.output_blocks:
@@ -191,7 +183,7 @@ def fid_inception_v3():
     inception.Mixed_6e = FIDInceptionC(768, channels_7x7=192)
     inception.Mixed_7b = FIDInceptionE_1(1280)
     inception.Mixed_7c = FIDInceptionE_2(2048)
-
+    
     state_dict = load_state_dict_from_url(FID_WEIGHTS_URL, progress=True)
     inception.load_state_dict(state_dict)
     return inception

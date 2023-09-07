@@ -21,6 +21,15 @@ NAME2CV2_FILTER = {
 }
 
 
+def crop_center(image):
+    height, width = image.shape[:2]
+    size = min(height, width)
+    start_height = (height - size) // 2
+    start_width = (width - size) // 2
+    cropped_image = image[start_height:start_height+size, start_width:start_width+size]
+    return cropped_image
+
+
 def resize_single_channel(x_np: np.ndarray, output_size: Tuple[int, int], filter) -> np.ndarray:
     s1, s2 = output_size
     img = Image.fromarray(x_np.astype(np.float32), mode='F')
@@ -30,15 +39,26 @@ def resize_single_channel(x_np: np.ndarray, output_size: Tuple[int, int], filter
 
 class Resizer:
 
-    def __init__(self, lib: str, filter_name: str, quantize_after: bool, output_size: Tuple[int, int]):
+    def __init__(
+        self, 
+        lib: str, 
+        filter_name: str, 
+        quantize_after: bool, 
+        output_size: Tuple[int, int],
+        center_crop: bool
+    ):
         assert lib in ['PIL', 'OpenCV']
 
         self.lib = lib
         self.filter_name = filter_name
         self.quantize_after = quantize_after
         self.output_size = output_size
+        self.center_crop = center_crop
 
     def __call__(self, img: np.ndarray) -> np.ndarray:
+        if self.center_crop:
+            img = crop_center(img)
+            
         if self.lib == "PIL" and self.quantize_after:
             filter_ = NAME2PIL_FILTER[self.filter_name]
             x = Image.fromarray(img)
@@ -47,7 +67,7 @@ class Resizer:
         elif self.lib == "PIL" and not self.quantize_after:
             filter_ = NAME2PIL_FILTER[self.filter_name]
             x = [resize_single_channel(img[:, :, idx], self.output_size, filter_) for idx in range(3)]
-            x = np.concatenate(x, axis=2).astype(np.float32)
+            x = np.concatenate(x, axis=2).clip(0, 255).astype(np.float32)
         elif self.lib == "OpenCV":
             filter_ = NAME2CV2_FILTER[self.filter_name]
             x = cv2.resize(img, self.output_size, interpolation=filter_)
@@ -59,6 +79,6 @@ class Resizer:
 
 def build_resizer(mode: str) -> Resizer:
     if mode == "clean":
-        return Resizer("PIL", "bicubic", False, (299, 299))
+        return Resizer("PIL", "bicubic", True, (299, 299), True)
     else:
         raise ValueError(f"Invalid resize mode: {mode}")
