@@ -1,0 +1,8 @@
+torch
+torchvision
+numpy
+scipy
+tqdm
+pillow
+datasets
+opencv-python
