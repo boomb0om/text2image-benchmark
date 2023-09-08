@@ -13,6 +13,7 @@ class BaseFeatureExtractor(ABC):
     This class serves as an interface for feature extraction techniques
     and should be subclassed for specific implementations, such as InceptionV3FE.
     """
+
     @abstractmethod
     def get_preprocess_fn(self) -> Callable[[Image.Image], np.ndarray]:
         """

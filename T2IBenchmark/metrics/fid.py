@@ -15,16 +15,6 @@ class FIDStats:
     """
 
     def __init__(self, mu: np.ndarray, sigma: np.ndarray):
-        """
-        Initialize the FIDStats with the given mean and covariance.
-
-        Parameters
-        ----------
-        mu : np.ndarray
-            The mean of the features.
-        sigma : np.ndarray
-            The covariance of the features.
-        """
         self.mu = mu
         self.sigma = sigma
     
