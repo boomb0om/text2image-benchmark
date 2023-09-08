@@ -12,7 +12,7 @@ from T2IBenchmark.metrics import FIDStats, frechet_distance
 from T2IBenchmark.utils import dprint, set_all_seeds
 
 
-def create_dataset_from_input(obj: Union[str, List[str], BaseImageLoader]) -> Union[BaseImageLoader, FIDStats]:
+def create_dataset_from_input(obj: Union[str, List[str], BaseImageLoader, FIDStats]) -> Union[BaseImageLoader, FIDStats]:
     if isinstance(obj, str):
         if obj.endswith('.npz'):
             # fid statistics
@@ -28,6 +28,8 @@ def create_dataset_from_input(obj: Union[str, List[str], BaseImageLoader]) -> Un
         dataset = ImageDataset(obj)
         return dataset
     elif isinstance(obj, BaseImageLoader):
+        return obj
+    elif isinstance(obj, FIDStats):
         return obj
     else:
         raise ValueError(f"Input {obj} has unknown type. See the documentation")
@@ -48,8 +50,8 @@ def get_features_for_dataset(
 
 
 def calculate_fid(
-    input1: Union[str, List[str], BaseImageLoader],
-    input2: Union[str, List[str], BaseImageLoader],
+    input1: Union[str, List[str], BaseImageLoader, FIDStats],
+    input2: Union[str, List[str], BaseImageLoader, FIDStats],
     device: torch.device = 'cuda',
     seed: Optional[int] = 42,
     batch_size: int = 128,
@@ -57,36 +59,36 @@ def calculate_fid(
     verbose: bool = True
 ) -> (int, Tuple[dict, dict]):
     """
-        Calculate the Frechet Inception Distance (FID) between two sets of images.
+    Calculate the Frechet Inception Distance (FID) between two sets of images.
 
-        Parameters
-        ----------
-        input1 : Union[str, List[str], BaseImageLoader]
-            The first set of images to compute the FID score for. This can either be
-            a path to .npz file, a list of image file paths or an instance
-            of BaseImageLoader.
-        input2 : Union[str, List[str], BaseImageLoader]
-            The second set of images to compute the FID score for. This can either be
-            a path to .npz file, a list of image file paths or an instance
-            of BaseImageLoader.
-        device : torch.device, optional, default='cuda'
-            The device to perform the calculations on, by default 'cuda'.
-        seed : int, optional, default=42
-            The seed value to ensure reproducibility, by default 42.
-        batch_size : int, optional, default=128
-            The batch size to use for processing the images, by default 128.
-        dataloader_workers : int, optional, default=16
-            The number of workers for data loading, by default 16.
-        verbose : bool, optional, default=True
-            Whether to print progress information, by default True.
+    Parameters
+    ----------
+    input1 : Union[str, List[str], BaseImageLoader]
+        The first set of images to compute the FID score for. This can either be
+        a path to directory, a path to .npz file, a list of image file paths, an instance
+        of BaseImageLoader or an instance of FIDStats.
+    input2 : Union[str, List[str], BaseImageLoader]
+        The second set of images to compute the FID score for. This can either be
+        a path to directory, a path to .npz file, a list of image file paths, an instance
+        of BaseImageLoader or an instance of FIDStats.
+    device : torch.device, optional, default='cuda'
+        The device to perform the calculations on, by default 'cuda'.
+    seed : int, optional, default=42
+        The seed value to ensure reproducibility, by default 42.
+    batch_size : int, optional, default=128
+        The batch size to use for processing the images, by default 128.
+    dataloader_workers : int, optional, default=16
+        The number of workers for data loading, by default 16.
+    verbose : bool, optional, default=True
+        Whether to print progress information, by default True.
 
-        Returns
-        -------
-        int
-            The computed FID score.
-        Tuple[dict, dict]
-            Two dictionaries containing the features and statistics of input1 and input2, respectively.
-        """
+    Returns
+    -------
+    int
+        The computed FID score.
+    Tuple[dict, dict]
+        Two dictionaries containing the features and statistics of input1 and input2, respectively.
+    """
     if seed:
         set_all_seeds(seed)
     
