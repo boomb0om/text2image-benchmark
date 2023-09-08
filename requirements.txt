@@ -3,6 +3,7 @@ torchvision
 numpy
 scipy
 tqdm
+glob
 pillow
 datasets
 opencv-python
