@@ -1,4 +1,4 @@
-# Text-to-Image-benchmark
+![](assets/logo.png)
 
 This project aims to unify the evaluation of generative text-to-image models and provide the ability to quickly and easily calculate most popular metrics.
 
