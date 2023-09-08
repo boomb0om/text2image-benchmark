@@ -23,32 +23,43 @@ Core features:
 
 ## Introduction
 
-Problems of calculating FID and examples
+Generative text-to-image models have become a popular and widely used tool for users. 
+There are many articles on the topic of image generation from text that present new, more advanced models.
+However, there is still no uniform way to measure the quality of such models.
+To address this issue, we provide an implementation of metrics to compare the quality of generative models.
+
+We propose to use the metric MS-COCO FID-30K with OpenAI's CLIP score, which has already become a standard for measuring the quality of text2image models. 
+We provide the MS-COCO validation subset and precalculated metrics for it. 
+We also recorded 30,000 descriptions that need to be used to generate images for MS-COCO FID-30K.
 
 ## Installation
 
-How users can install your project.
-
-*Name of your project* can be installed with `pip`:
-
-```markdown
-pip install name
+```bash
+pip install git+https://github.com/boomb0om/text2image-benchmark
 ```
 
-## Examples
+## Getting started
 
-Describe examples how it should work and should be used.
-Images, GIFs and code cells are welcome.
+**Calculate FID for two sets of images**:
+
+```python
+from T2IBenchmark import calculate_fid
+
+fid, _ = calculate_fid('assets/images/cats/', 'assets/images/dogs/')
+print(fid)
+```
 
 ## Project Structure
 
-Stable version is located ...
-
-Repo includes:
-
-- package 1 - explanation
-- package 2 - explanation
-- etc.
+- `T2IBenchmark/`
+  - `datasets/` - Datasets that can be used for evaluation
+    - `coco2014/` - MS-COCO 2014 validation subset
+  - `feature_extractors/` - Implementation of different neural nets used to extract features from images
+  - `metrics/` - Implementation of metrics
+  - `utils/` - Some utils
+- `docs/` - Documentation
+- `examples/` - Usage examples
+- `experiments/` - Experiments
 
 ## Documentation
 
