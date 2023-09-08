@@ -7,6 +7,7 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 
+from T2IBenchmark.model_wrapper import T2IModelWrapper, ModelWrapperDataloader
 from T2IBenchmark.feature_extractors import BaseFeatureExtractor, InceptionV3FE
 from T2IBenchmark.loaders import (
     BaseImageLoader,
@@ -20,7 +21,7 @@ from T2IBenchmark.utils import dprint, set_all_seeds
 
 
 def create_dataset_from_input(
-    obj: Union[str, List[str], BaseImageLoader]
+        obj: Union[str, List[str], BaseImageLoader, FIDStats]
 ) -> Union[BaseImageLoader, FIDStats]:
     if isinstance(obj, str):
         if obj.endswith(".npz"):
@@ -38,6 +39,8 @@ def create_dataset_from_input(
         return dataset
     elif isinstance(obj, BaseImageLoader):
         return obj
+    elif isinstance(obj, FIDStats):
+        return obj
     else:
         raise ValueError(f"Input {obj} has unknown type. See the documentation")
 
@@ -48,7 +51,7 @@ def get_features_for_dataset(
     verbose: bool = True,
 ) -> np.ndarray:
     features = []
-    for x in tqdm(dataset):
+    for x in tqdm(dataset, disable=not verbose):
         feats = feature_extractor.forward(x).numpy()
         features.append(feats)
 
@@ -57,14 +60,45 @@ def get_features_for_dataset(
 
 
 def calculate_fid(
-    input1: Union[str, List[str], BaseImageLoader],
-    input2: Union[str, List[str], BaseImageLoader],
-    device: torch.device = "cuda",
+    input1: Union[str, List[str], BaseImageLoader, FIDStats],
+    input2: Union[str, List[str], BaseImageLoader, FIDStats],
+    device: torch.device = 'cuda',
     seed: Optional[int] = 42,
     batch_size: int = 128,
     dataloader_workers: int = 16,
     verbose: bool = True,
 ) -> (int, Tuple[dict, dict]):
+    """
+    Calculate the Frechet Inception Distance (FID) between two sets of images.
+
+    Parameters
+    ----------
+    input1 : Union[str, List[str], BaseImageLoader]
+        The first set of images to compute the FID score for. This can either be
+        a path to directory, a path to .npz file, a list of image file paths, an instance
+        of BaseImageLoader or an instance of FIDStats.
+    input2 : Union[str, List[str], BaseImageLoader]
+        The second set of images to compute the FID score for. This can either be
+        a path to directory, a path to .npz file, a list of image file paths, an instance
+        of BaseImageLoader or an instance of FIDStats.
+    device : torch.device, optional, default='cuda'
+        The device to perform the calculations on, by default 'cuda'.
+    seed : int, optional, default=42
+        The seed value to ensure reproducibility, by default 42.
+    batch_size : int, optional, default=128
+        The batch size to use for processing the images, by default 128.
+    dataloader_workers : int, optional, default=16
+        The number of workers for data loading, by default 16.
+    verbose : bool, optional, default=True
+        Whether to print progress information, by default True.
+
+    Returns
+    -------
+    int
+        The computed FID score.
+    Tuple[dict, dict]
+        Two dictionaries containing the features and statistics of input1 and input2, respectively.
+    """
     if seed:
         set_all_seeds(seed)
 
@@ -98,9 +132,12 @@ def calculate_fid(
             )
             all_features.append(features)
             stats.append(FIDStats.from_features(features))
-        else:
-            raise NotImplementedError()
-
+        elif isinstance(input_data, T2IModelWrapper):
+            dataloader = ModelWrapperDataloader(input_data, batch_size, preprocess_fn=inception_fe.get_preprocess_fn())
+            features = get_features_for_dataset(dataloader, inception_fe, verbose=verbose)
+            all_features.append(features)
+            stats.append(FIDStats.from_features(features))
+            
     fid = frechet_distance(stats[0], stats[1])
     dprint(verbose, f"FID is {fid}")
     return fid, (
