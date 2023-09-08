@@ -56,6 +56,37 @@ def calculate_fid(
     dataloader_workers: int = 16,
     verbose: bool = True
 ) -> (int, Tuple[dict, dict]):
+    """
+        Calculate the Frechet Inception Distance (FID) between two sets of images.
+
+        Parameters
+        ----------
+        input1 : Union[str, List[str], BaseImageLoader]
+            The first set of images to compute the FID score for. This can either be
+            a path to .npz file, a list of image file paths or an instance
+            of BaseImageLoader.
+        input2 : Union[str, List[str], BaseImageLoader]
+            The second set of images to compute the FID score for. This can either be
+            a path to .npz file, a list of image file paths or an instance
+            of BaseImageLoader.
+        device : torch.device, optional, default='cuda'
+            The device to perform the calculations on, by default 'cuda'.
+        seed : int, optional, default=42
+            The seed value to ensure reproducibility, by default 42.
+        batch_size : int, optional, default=128
+            The batch size to use for processing the images, by default 128.
+        dataloader_workers : int, optional, default=16
+            The number of workers for data loading, by default 16.
+        verbose : bool, optional, default=True
+            Whether to print progress information, by default True.
+
+        Returns
+        -------
+        int
+            The computed FID score.
+        Tuple[dict, dict]
+            Two dictionaries containing the features and statistics of input1 and input2, respectively.
+        """
     if seed:
         set_all_seeds(seed)
     
