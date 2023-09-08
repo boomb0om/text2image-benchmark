@@ -5,6 +5,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
 
+from T2IBenchmark.model_wrapper import T2IModelWrapper, ModelWrapperDataloader
 from T2IBenchmark.feature_extractors import BaseFeatureExtractor, InceptionV3FE
 from T2IBenchmark.loaders import BaseImageLoader, ImageDataset, get_images_from_folder, validate_image_paths
 from T2IBenchmark.metrics import FIDStats, frechet_distance
@@ -38,7 +39,7 @@ def get_features_for_dataset(
     verbose: bool = True
 ) -> np.ndarray:
     features = []
-    for x in tqdm(dataset):
+    for x in tqdm(dataset, disable=not verbose):
         feats = feature_extractor.forward(x).numpy()
         features.append(feats)
         
@@ -83,8 +84,11 @@ def calculate_fid(
             features = get_features_for_dataset(dataloader, inception_fe, verbose=verbose)
             all_features.append(features)
             stats.append(FIDStats.from_features(features))
-        else:
-            raise NotImplementedError()
+        elif isinstance(input_data, T2IModelWrapper):
+            dataloader = ModelWrapperDataloader(input_data, batch_size, preprocess_fn=inception_fe.get_preprocess_fn())
+            features = get_features_for_dataset(dataloader, inception_fe, verbose=verbose)
+            all_features.append(features)
+            stats.append(FIDStats.from_features(features))
             
     fid = frechet_distance(stats[0], stats[1])
     dprint(verbose, f"FID is {fid}")
