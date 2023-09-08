@@ -3,21 +3,75 @@ from scipy import linalg
 
 
 class FIDStats:
-    
+    """
+    A class to calculate and store FID statistics (mean and covariance).
+
+    Attributes
+    ----------
+    mu : np.ndarray
+       The mean of the features.
+    sigma : np.ndarray
+       The covariance of the features.
+    """
+
     def __init__(self, mu: np.ndarray, sigma: np.ndarray):
+        """
+        Initialize the FIDStats with the given mean and covariance.
+
+        Parameters
+        ----------
+        mu : np.ndarray
+            The mean of the features.
+        sigma : np.ndarray
+            The covariance of the features.
+        """
         self.mu = mu
         self.sigma = sigma
     
     def to_npz(self, path: str):
+        """
+        Save the FID statistics (mean and covariance) to a .npz file.
+
+        Parameters
+        ----------
+        path : str
+            The path to the .npz file.
+        """
         np.savez(path, mu=self.mu, sigma=self.sigma)
         
     @classmethod
     def from_features(cls, features: np.ndarray) -> "FIDStats":
+        """
+        Create a FIDStats object from the given features.
+
+        Parameters
+        ----------
+        features : np.ndarray
+            The features to calculate mean and covariance from.
+
+        Returns
+        -------
+        FIDStats
+            A FIDStats object containing the mean and covariance of the input features.
+        """
         mu, sigma = np.mean(features, axis=0), np.cov(features, rowvar=False)
         return cls(mu, sigma)
     
     @classmethod
     def from_npz(cls, path: str) -> "FIDStats":
+        """
+        Load FID statistics (mean and covariance) from a .npz file.
+
+        Parameters
+        ----------
+        path : str
+            The path to the .npz file.
+
+        Returns
+        -------
+        FIDStats
+            A FIDStats object containing the mean and covariance loaded from the .npz file.
+        """
         data = np.load(path)
         mu = data['mu']
         sigma = data['sigma']
