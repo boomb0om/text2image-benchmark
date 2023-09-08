@@ -16,6 +16,7 @@ from T2IBenchmark.loaders import (
     get_images_from_folder,
     validate_image_paths,
 )
+from T2IBenchmark.datasets import get_coco_30k_captions, get_coco_fid_stats
 from T2IBenchmark.metrics import FIDStats, frechet_distance
 from T2IBenchmark.utils import dprint, set_all_seeds
 
@@ -144,6 +145,32 @@ def calculate_fid(
         {"features": all_features[0], "stats": stats[0]},
         {"features": all_features[1], "stats": stats[1]},
     )
+
+
+def calculate_coco_fid(
+    ModelWrapper: T2IModelWrapper,
+    device: torch.device = 'cuda',
+    seed: Optional[int] = 42,
+    batch_size: int = 1,
+    save_generations_dir: str = 'coco_generations/'
+) -> (int, Tuple[dict, dict]):
+    os.makedirs(save_generations_dir, exist_ok=True)
+    # get COCO-30k captions
+    id2caption = get_coco_30k_captions()
+    captions = []
+    ids = []
+    for d in id2caption.items():
+        ids.append(d[0])
+        captions.append(d[1])
+        
+    # init model
+    model = ModelWrapper(device, save_dir=save_generations_dir, use_saved_images=True, seed=seed)
+    model.set_captions(captions, file_ids=ids)
+    
+    # get coco FID stats
+    coco_stats = get_coco_fid_stats()
+    
+    return calculate_fid(coco_stats, model, device=device, seed=seed, batch_size=batch_size)
 
 
 def calculate_clip_score(

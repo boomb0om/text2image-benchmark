@@ -55,6 +55,7 @@ class T2IModelWrapper(BaseImageLoader):
         self.captions = captions
         self.file_ids = file_ids
         if self.save_dir:
+            os.makedirs(self.save_dir, exist_ok=True)
             if self.file_ids is None:
                 self.file_ids = [i for i in range(len(captions))]
             assert len(self.file_ids) == len(self.captions)

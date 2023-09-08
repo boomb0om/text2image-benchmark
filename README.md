@@ -2,14 +2,15 @@
 
 This project aims to unify the evaluation of generative text-to-image models and provide the ability to quickly and easily calculate most popular metrics.
 
-Core features:
+Goals of this benchmark:
 - **Unified** metrics and datasets for all models
 - **Reproducible** results
-- **User-friendly** interface for most popular metrics: FID, CLIP-score, IS
+- **User-friendly** interface for most popular metrics: FID and CLIP-score
 
 ## Table of Contents
 
 - [Introduction](#introduction)
+- [Main features](#main-features)
 - [Installation](#installation)
 - [Getting started](#getting-started)
 - [Project Structure](#project-structure)
@@ -33,6 +34,13 @@ We also recorded 30,000 descriptions that needs to be used to generate images fo
 
 You can easily contribute your model into benchmark and make FID results reproducible! See more in [contribution](#contribution) section.
 
+## Main features
+
+- Standardized FID calculation: fixed image preprocessing and InceptionV3 model.
+- FID-30k on MS-COCO validation set: we provide dataset on [huggingface🤗](https://huggingface.co/datasets/stasstaf/MS-COCO-validation), [precomputed FID stats](https://github.com/boomb0om/text2image-benchmark/releases/download/v0.0.1/MS-COCO_val2014_fid_stats.npz), fixed [30000 captions from MS-COCO](https://github.com/boomb0om/text2image-benchmark/releases/download/v0.0.1/MS-COCO_val2014_30k_captions.csv) that should be used to generate images
+- CLIP-score calculation
+- User-friendly metrics calculation (checkout [Getting started](#getting-started))
+
 ## Installation
 
 ```bash
@@ -40,6 +48,9 @@ pip install git+https://github.com/boomb0om/text2image-benchmark
 ```
 
 ## Getting started
+
+
+### Metrics: FID
 
 Calculate FID for two sets of images:
 
@@ -49,6 +60,35 @@ from T2IBenchmark import calculate_fid
 fid, _ = calculate_fid('assets/images/cats/', 'assets/images/dogs/')
 print(fid)
 ```
+
+Calculate FID between model generations and MS-COCO validation subset:
+
+```python
+from T2IBenchmark import calculate_fid
+from T2IBenchmark.datasets import get_coco_fid_stats
+
+fid, _ = calculate_fid(
+    'path/to/your/generations/',
+    get_coco_fid_stats()
+)
+```
+
+MS-COCO FID-30k for T2IModelWrapper. In this example we are using [Kandinsky 2.1](https://github.com/ai-forever/Kandinsky-2) model:
+
+```bash
+pip install -r T2IBenchmark/models/kandinsky21/requirements.txt
+```
+
+```python
+from T2IBenchmark import calculate_fid
+from T2IBenchmark.datasets import get_coco_fid_stats
+
+fid, _ = calculate_fid(
+    'path/to/your/generations/',
+    get_coco_fid_stats()
+)
+```
+
 
 ## Project Structure
 
