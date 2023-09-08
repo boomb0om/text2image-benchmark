@@ -9,4 +9,3 @@ datasets
 opencv-python
 ftfy
 regex
-git+https://github.com/openai/CLIP.git
