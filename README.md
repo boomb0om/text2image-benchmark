@@ -46,6 +46,7 @@ You can easily contribute your model into benchmark and make FID results reprodu
 ## Installation
 
 ```bash
+pip install git+https://github.com/openai/CLIP.git
 pip install git+https://github.com/boomb0om/text2image-benchmark
 ```
 
