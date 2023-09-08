@@ -174,7 +174,6 @@ def calculate_clip_score(
 
     score_acc = 0.0
     num_samples = 0.0
-    logit_scale = model.logit_scale.exp()
 
     for image, caption in tqdm(dataloader):
         image_embedding = model.encode_image(image.to(device))
@@ -187,7 +186,7 @@ def calculate_clip_score(
             dim=1, keepdim=True
         ).to(torch.float32)
 
-        score = logit_scale * (image_features * caption_features).sum()
+        score = (image_features * caption_features).sum()
         score_acc += score
         num_samples += image.shape[0]
 

@@ -4,7 +4,11 @@ import os
 from PIL import Image
 from io import BytesIO
 import torch
-from torch.utils.data import Dataset, default_collate
+from torch.utils.data import Dataset
+try:
+    from torch.utils.data import default_collate
+except ImportError:
+    from torch.utils.data._utils.collate import default_collate
 
 from T2IBenchmark.loaders import BaseImageLoader
 from T2IBenchmark.utils import IMAGE_EXTENSIONS, set_all_seeds
