@@ -1,5 +1,5 @@
 from typing import List, Optional, Callable, Any
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 import os
 from PIL import Image
 from torch.utils.data import Dataset
@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 from T2IBenchmark.utils import IMAGE_EXTENSIONS
 
 
-class BaseImageLoader:
+class BaseImageLoader(ABC):
 
     @abstractmethod
     def __len__(self) -> int:
