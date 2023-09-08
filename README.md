@@ -3,23 +3,22 @@
 This project aims to unify the evaluation of generative text-to-image models and provide the ability to quickly and easily calculate most popular metrics.
 
 Core features:
-- **Reproducible** results
 - **Unified** metrics and datasets for all models
-- **User-friendly** interface for most popular metrics: FID, IS, CLIP-score
+- **Reproducible** results
+- **User-friendly** interface for most popular metrics: FID, CLIP-score, IS
 
 ## Table of Contents
 
 - [Introduction](#introduction)
 - [Installation](#installation)
-- [Examples](#examples)
-- [Project Structure](#project-structure)
-- [Documentation](#documentation)
 - [Getting started](#getting-started)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
+- [Project Structure](#project-structure)
+- [Examples](#examples)
+- [Documentation](#documentation)
+- [Contribution](#contribution)
 - [Contacts](#contacts)
-- [Citation](#citation)
-- [Examples of good README's](#examples-of-good-readmes)
+- [Citing](#citing)
+- [Acknowledgments](#acknowledgments)
 
 ## Introduction
 
@@ -30,7 +29,9 @@ To address this issue, we provide an implementation of metrics to compare the qu
 
 We propose to use the metric MS-COCO FID-30K with OpenAI's CLIP score, which has already become a standard for measuring the quality of text2image models. 
 We provide the MS-COCO validation subset and precalculated metrics for it. 
-We also recorded 30,000 descriptions that need to be used to generate images for MS-COCO FID-30K.
+We also recorded 30,000 descriptions that needs to be used to generate images for MS-COCO FID-30K.
+
+You can easily contribute your model into benchmark and make FID results reproducible! See more in [contribution](#contribution) section.
 
 ## Installation
 
@@ -40,7 +41,7 @@ pip install git+https://github.com/boomb0om/text2image-benchmark
 
 ## Getting started
 
-**Calculate FID for two sets of images**:
+Calculate FID for two sets of images:
 
 ```python
 from T2IBenchmark import calculate_fid
@@ -60,45 +61,42 @@ print(fid)
 - `docs/` - Documentation
 - `examples/` - Usage examples
 - `experiments/` - Experiments
+- `assets/` - Assets
+
+## Examples
+
+
 
 ## Documentation
 
-Link to the documentation
 
-## Getting started
 
-Tutorials if any
+## Contribution
 
-## License
 
-Link to the license
-
-## Acknowledgments
-
-Acknowledgments
 
 ## Contacts
 
-Your contacts. For example:
+If you have any question, please email `jeartgle@gmail.com`.
 
-- [Telegram channel](https://t.me/) answering questions about your project
-- [VK group](<https://vk.com/>) your VK group
-- etc.
+## Citing
 
-## Citation
+If you use this repository in your research, consider citing it using the following Bibtex entry:
 
-@article{"name",
-  title = {},
-  author = {},
-  journal = {},
-  year = {},
-  issn = {},
-  doi = {}}
+```
+@misc{boomb0omT2IBenchmark,
+  author={Pavlov, I. and Ivanov, A. and Stafievskiy, S.},
+  title={{Text-to-Image Benchmark: A benchmark for generative models}},
+  howpublished={\url{https://github.com/boomb0om/text2image-benchmark}},
+  month={September},
+  year={2023},
+  note={Version 0.1.0},
+}
+```
 
-bibtex-ссылку удобно брать с google scholar
+## Acknowledgments
 
-# Examples of good README's
+Thanks to:
 
-- <https://github.com/pytorch/pytorch>
-- <https://github.com/scikit-learn/scikit-learn>
-- <https://github.com/aimclub/FEDOT>
+- [clean-fid](https://github.com/GaParmar/clean-fid/) - Explanation of influence of various parameters when calculating FID.
+- [pytorch-fid](https://github.com/mseitzer/pytorch-fid) - Port of the official implementation of Frechet Inception Distance to PyTorch.
