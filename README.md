@@ -100,7 +100,7 @@ Example of calculating CLIP-score for a set of images and fixed prompt:
 from T2IBenchmark import calculate_clip_score
 from glob import glob
 
-cat_paths = glob('../assets/images/cats/*.jpg')
+cat_paths = glob('assets/images/cats/*.jpg')
 captions_mapping = {path: "a cat" for path in cat_paths}
 clip_score = calculate_clip_score(cat_paths, captions_mapping=captions_mapping)
 ```
